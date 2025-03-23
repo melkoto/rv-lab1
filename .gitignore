@@ -18,6 +18,9 @@
 /wp-*.php
 /xmlrpc.php
 
+# IDEs
+/.idea
+
 # Configuration
 wp-config.php
 
