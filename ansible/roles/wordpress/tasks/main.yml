@@ -38,7 +38,12 @@
     dest: "{{ lookup('env', 'HOME') }}/wordpress/docker-compose.yml"
     mode: '0644'
 
-- name: Запустить контейнеры через Docker Compose
-  command: docker-compose up -d
+- name: Остановить и удалить старые контейнеры, образы и тома
+  command: docker-compose down --rmi all --volumes --remove-orphans
+  args:
+    chdir: "{{ lookup('env', 'HOME') }}/wordpress"
+
+- name: Запустить контейнеры через Docker Compose с пересборкой
+  command: docker-compose up --build -d
   args:
     chdir: "{{ lookup('env', 'HOME') }}/wordpress"
