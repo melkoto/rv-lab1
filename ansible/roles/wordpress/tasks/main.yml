@@ -1,0 +1,50 @@
+- name: Обновить apt-кэш
+  apt:
+    update_cache: yes
+  become: yes
+
+- name: Установить Docker (docker.io)
+  apt:
+    name: docker.io
+    state: present
+  become: yes
+
+- name: Убедиться, что pip установлен (для установки docker-compose через pip, если потребуется)
+  apt:
+    name: python3-pip
+    state: present
+  become: yes
+
+- name: Установить Docker Compose через get_url (бинарный файл)
+  get_url:
+    url: "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-{{ ansible_system | lower }}-{{ ansible_architecture }}"
+    dest: /usr/local/bin/docker-compose
+    mode: '0755'
+  become: yes
+  # Если ansible_system не подставляется, можно заменить на `uname -s` и `uname -m` вручную.
+
+- name: Создать директорию для Docker Compose файлов
+  file:
+    path: /opt/wordpress
+    state: directory
+    mode: '0755'
+  become: yes
+
+- name: Создать Docker-сеть "wp_network"
+  docker_network:
+    name: wp_network
+    state: present
+  become: yes
+
+- name: Скопировать шаблон docker-compose.yml в /opt/wordpress/
+  template:
+    src: templates/docker-compose.yml.j2
+    dest: /opt/wordpress/docker-compose.yml
+    mode: '0644'
+  become: yes
+
+- name: Запустить контейнеры через Docker Compose
+  command: docker-compose up -d
+  args:
+    chdir: /opt/wordpress
+  become: yes

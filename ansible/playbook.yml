@@ -1,0 +1,5 @@
+- name: Развёртывание WordPress на удалённом сервере
+  hosts: all
+  become: yes
+  roles:
+    - wordpress
